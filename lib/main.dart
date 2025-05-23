@@ -57,7 +57,8 @@ class _TodoListPageState extends State<TodoListPage> {
   final List<String> _places = ['リビング', 'キッチン', 'お風呂', 'トイレ', '玄関', '自分の部屋'];
   final List<String> _frequencies = ['毎日', '週1', '月1', '気が向いたら'];
 
-  bool _isCalendarOpen = true;
+  bool _isCalendarOpen = true; // カレンダーの表示状態
+  bool _completedTileExpanded = false; // 完了済みタスクの表示状態
 
   void _addTodo() {
     if (_contentController.text.isNotEmpty) {
@@ -122,7 +123,7 @@ class _TodoListPageState extends State<TodoListPage> {
     final tasks = _tasksByDate[_selectedDay] ?? [];
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(title: const Text('掃除ToDoリスト✨')),
+      appBar: AppBar(title: const Text('Cleaning Todo')),
       body: Column(
         children: [
           Padding(
@@ -246,56 +247,69 @@ class _TodoListPageState extends State<TodoListPage> {
                       },
                     ),
                   ),
-                  const Divider(),
-                  ExpansionTile(
-                    title: const Text(
-                      '完了済み',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    initiallyExpanded: false, // 最初から開いておきたいならtrue
-                    children: [
-                      _completed.isEmpty
-                          ? const Center(child: Text('完了済みのタスクはありません'))
-                          : ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: _completed.length,
-                              itemBuilder: (context, index) {
-                                final task = _completed[index];
-                                return ListTile(
-                                  leading: Transform.scale(
-                                    scale: 1.2,
-                                    child: Checkbox(
-                                      value: true,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          task.isCompleted = value!;
-                                          if (!task.isCompleted) {
-                                            _completed.removeAt(index);
-                                            if (_tasksByDate[task.date] ==
-                                                null) {
-                                              _tasksByDate[task.date] = [];
+                  // const Divider(),
+                  AnimatedSlide(
+                    offset: _completedTileExpanded
+                        ? const Offset(0, -0.5)
+                        : Offset.zero,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOut,
+                    child: ExpansionTile(
+                      title: const Text(
+                        '完了済み',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      initiallyExpanded: false, // 最初から開いておきたいならtrue
+                      onExpansionChanged: (expanded) {
+                        setState(() {
+                          _completedTileExpanded = expanded;
+                        });
+                      },
+                      children: [
+                        _completed.isEmpty
+                            ? const Center(child: Text('完了済みのタスクはありません'))
+                            : ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: _completed.length,
+                                itemBuilder: (context, index) {
+                                  final task = _completed[index];
+                                  return ListTile(
+                                    leading: Transform.scale(
+                                      scale: 1.2,
+                                      child: Checkbox(
+                                        value: true,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            task.isCompleted = value!;
+                                            if (!task.isCompleted) {
+                                              _completed.removeAt(index);
+                                              if (_tasksByDate[task.date] ==
+                                                  null) {
+                                                _tasksByDate[task.date] = [];
+                                              }
+                                              _tasksByDate[task.date]!
+                                                  .add(task);
                                             }
-                                            _tasksByDate[task.date]!.add(task);
-                                          }
-                                        });
-                                      },
+                                          });
+                                        },
+                                      ),
                                     ),
-                                  ),
-                                  title: Text(
-                                    '${task.place}｜${task.content}',
-                                    style: const TextStyle(
-                                      decoration: TextDecoration.lineThrough,
-                                      color: Colors.grey,
+                                    title: Text(
+                                      '${task.place}｜${task.content}',
+                                      style: const TextStyle(
+                                        decoration: TextDecoration.lineThrough,
+                                        color: Colors.grey,
+                                      ),
                                     ),
-                                  ),
-                                  subtitle: Text(
-                                      '頻度: ${task.frequency}\n${task.memo}'),
-                                  isThreeLine: true,
-                                );
-                              },
-                            ),
-                    ],
+                                    subtitle: Text(
+                                        '頻度: ${task.frequency}\n${task.memo}'),
+                                    isThreeLine: true,
+                                  );
+                                },
+                              ),
+                      ],
+                    ),
                   ),
                 ],
               ),
