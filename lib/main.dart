@@ -63,6 +63,19 @@ class _TodoListPageState extends State<TodoListPage> {
   void _addTodo() {
     if (_contentController.text.isNotEmpty) {
       setState(() {
+        final Map<String, String> placeTips = {
+          'リビング': 'ホコリは高いところから下に落とすと効率UP！',
+          'キッチン': 'シンクは使ったらすぐ拭くと水垢防止になるよ！',
+          'お風呂': '換気をしっかりするとカビ予防になるよ！',
+          'トイレ': '床も壁もサッと拭くと清潔感キープ！',
+          '玄関': '靴は揃えておくと運気もUP！？',
+          '自分の部屋': 'ベッド下も忘れずにチェックしよ！',
+        };
+
+        String tip = placeTips[_selectedPlace] ?? '';
+        String userMemo = _memoController.text.trim();
+        String combinedMemo = userMemo.isEmpty ? tip : '$userMemo\n$tip';
+
         DateTime startDay = _selectedDay;
         DateTime endDay = startDay.add(const Duration(days: 365)); // 1年分追加する想定
 
@@ -91,7 +104,7 @@ class _TodoListPageState extends State<TodoListPage> {
             place: _selectedPlace,
             content: _contentController.text,
             frequency: _selectedFrequency,
-            memo: _memoController.text,
+            memo: combinedMemo,
             date: current,
           );
           if (_tasksByDate[current] == null) {
