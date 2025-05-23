@@ -25,7 +25,6 @@ class CleaningTask {
   final DateTime date;
   bool isCompleted;
 
-
   CleaningTask({
     required this.place,
     required this.content,
@@ -33,6 +32,7 @@ class CleaningTask {
     required this.memo,
     required this.date,
     this.isCompleted = false,
+  });
 }
 
 class TodoListPage extends StatefulWidget {
@@ -43,7 +43,6 @@ class TodoListPage extends StatefulWidget {
 }
 
 class _TodoListPageState extends State<TodoListPage> {
-  
   final Map<DateTime, List<CleaningTask>> _tasksByDate = {};
   DateTime _selectedDay = DateTime.now();
 
@@ -256,7 +255,6 @@ class _TodoListPageState extends State<TodoListPage> {
                             ),
                           ),
                           title: Text('${task.place}｜${task.content}'),
-
                           subtitle: Text('頻度: ${task.frequency}\n${task.memo}'),
                           isThreeLine: true,
                         );
@@ -330,7 +328,6 @@ class _TodoListPageState extends State<TodoListPage> {
                 ],
               ),
             ),
-
           ),
         ],
       ),
